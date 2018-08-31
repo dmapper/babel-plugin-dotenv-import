@@ -1,4 +1,4 @@
-const {readFileSync} = require('fs')
+const {readFileSync, existsSync} = require('fs')
 const dotenv = require('dotenv')
 
 module.exports = ({types: t}) => ({
@@ -14,14 +14,12 @@ module.exports = ({types: t}) => ({
       allowUndefined: false
     }, this.opts)
 
-    if (this.opts.safe) {
-      this.env = dotenv.parse(readFileSync(this.opts.path))
-    } else {
-      dotenv.config({
-        path: this.opts.path
-      })
-      this.env = process.env
+    const paths = Array.isArray(this.opts.path) ? this.opts.path : [this.opts.path]
+    if (this.opts.safe) process.env = {}
+    for (let path of paths) {
+      if (existsSync(path)) dotenv.config({path})
     }
+    this.env = process.env
   },
 
   visitor: {
