@@ -15,11 +15,11 @@ module.exports = ({types: t}) => ({
     }, this.opts)
 
     const paths = Array.isArray(this.opts.path) ? this.opts.path : [this.opts.path]
-    if (this.opts.safe) process.env = {}
+    this.env = {}
     for (let path of paths) {
-      if (existsSync(path)) dotenv.config({path})
+      if (existsSync(path)) Object.assign(this.env, dotenv.parse(readFileSync(path)))
     }
-    this.env = process.env
+    if (!this.opts.safe) Object.assign(this.env, process.env)
   },
 
   visitor: {
